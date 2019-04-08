@@ -1,0 +1,5 @@
+REPOSITORY                     TAG                 IMAGE ID            CREATED             SIZE
+gitarrissima/ubuntu-tmp-file   latest              21ab2fcfceb2        5 minutes ago       109MB
+nginx                          latest              2bcb04bdb83f        11 days ago         109MB
+ubuntu                         16.04               9361ce633ff1        3 weeks ago         118MB
+hello-world                    latest              fce289e99eb9        3 months ago        1.84kB
