@@ -1,0 +1,8 @@
+- name: Start container
+  docker_container:
+    name: test
+    image: gitarrissima/otus-reddit:1.0
+    state: started
+    ports: 
+      - 9292:9292
+
