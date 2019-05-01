@@ -1,0 +1,72 @@
+image: ruby:2.4.2
+
+stages:
+  - build
+  - test
+  - review
+  - release
+  - deploy
+
+
+before_script:
+  - cd reddit
+  - bundle install
+
+build_job:
+  stage: build
+  script:
+    - echo 'Building'
+
+test_unit_job:
+  stage: test
+  variables:
+    DATABASE_URL: 'mongodb://mongo/user_posts'
+  services:
+    - mongo:latest
+  script:
+    - ruby simpletest.rb
+
+deploy_dev_job:
+  stage: review
+  script:
+    - echo "Deploy to $CI_ENVIRONMENT_SLUG"
+  environment:
+    name: branch/$CI_COMMIT_REF_NAME
+    url: http://$CI_ENVIRONMENT_SLUG.example.com
+  only:
+    - branches
+  except:
+    - master
+
+release_job:
+  image: docker:stable
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_DRIVER: overlay2
+  stage: release
+  services:
+    - docker:dind
+  before_script:
+    - docker info
+    - "docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}"
+  script:
+    - cd docker-monolith
+    - "docker build -t gitarrissima/example:latest ."
+    - "docker push gitarrissima/example:latest"
+  after_script:
+    - "docker logout"
+
+deploy_job:
+  image: gitlab/dind:latest
+  stage: deploy
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$DEPLOY_SERVER_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - whoami
+    - ssh-keyscan -H $DEPLOYMENT_SERVER_IP >> ~/.ssh/known_hosts
+  script:
+    - ssh test@$DEPLOYMENT_SERVER_IP "sudo docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASSWORD}; sudo docker kill test_deploy || true; sudo docker rm test_deploy || true; sudo docker run -d --name test_deploy -p 9292:9292 gitarrissima/example:latest"
+
