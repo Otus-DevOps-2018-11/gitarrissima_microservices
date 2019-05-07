@@ -1,3 +1,12 @@
+#20
+- установила prometheus
+- собрала и запушила все образы: prometheus и приложения (https://hub.docker.com/u/gitarrissima)
+- изучила, какие метрики присылает в prometheus наше приложение
+- разобралась с exporter 
+- Задания со звездочкой:
+  1. добавила мониторинг mongodb
+  2. добавила blackbox exporter coudprobe (от Google)
+
 #19
 - установила gitlab
 - разобралась с конфигурацией: runners, variables, integrations

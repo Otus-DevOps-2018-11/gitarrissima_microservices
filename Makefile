@@ -6,4 +6,3 @@ DEPENDS=.depends.mk
 all:
 	@echo $(value DOCKERFILES)
 	@echo $(value IMAGES)
-
