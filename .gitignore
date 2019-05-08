@@ -7,4 +7,5 @@ jdauphant.nginx
 vault.key
 *.retry
 service_account.json
+.env
 
