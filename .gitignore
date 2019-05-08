@@ -8,4 +8,3 @@ vault.key
 *.retry
 service_account.json
 .env
-
