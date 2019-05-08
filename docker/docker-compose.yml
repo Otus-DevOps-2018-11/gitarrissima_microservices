@@ -38,6 +38,48 @@ services:
       - mynet
     environment:
       - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+  prometheus:
+    image: ${USERNAME}/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=1d'
+    networks:
+      - mynet
+  node-exporter:
+    image: prom/node-exporter:v0.15.2
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    networks:
+      - mynet
+
+  mongo-exporter:
+    image: ${USERNAME}/mongodb_exporter
+    entrypoint:
+      - /bin/mongodb_exporter
+      - --mongodb.uri=mongodb://post_db:27017
+    networks:
+      - mynet
+
+  cloudprober:
+    image: ${USERNAME}/cloudprober
+    entrypoint:
+      - ./cloudprober
+      - --config_file
+      - /etc/cloudprober.cfg
+    networks:
+      - mynet
 
 volumes:
   prometheus_data:
