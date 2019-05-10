@@ -8,3 +8,4 @@ vault.key
 *.retry
 service_account.json
 .env
+Gitlab_ci
